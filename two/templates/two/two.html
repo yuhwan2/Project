@@ -1,12 +1,13 @@
-<!-- two.html -->
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CSV Data Graph</title>
+    <title>자라태양광</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
     <style>
         .chart-container {
             position: relative;
@@ -14,14 +15,49 @@
             height: 80vh;
             width: 80vw;
         }
+        body {
+            font-family: 'Open Sans', sans-serif;
+        }
     </style>
 </head>
+
 <body class="bg-gray-100">
+    <div class="container mx-auto p-4">
+        <nav class="bg-blue-500 p-4 mb-4">
+            <ul class="flex space-x-4 text-white">
+                <li class="nav-item">
+                    <a class="nav-link" href="https://jinsoo.pythonanywhere.com/two/">바라보다</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="https://jinsoo.pythonanywhere.com/two/">자라태양광</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Link</a>
+                </li>
+            </ul>
+        </nav>
+        <h1 class="text-2xl font-semibold text-gray-800 mb-4" style="text-align: center;">바라보다</h1>
+        <form method="post" action="{% url 'home' %}">
+            {% csrf_token %}
+            <div class="flex flex-col items-center space-y-4">
+                <input name="date-input" id="date-input" type="date" class="border-2 border-gray-300 rounded-lg p-2 text-gray-700 focus:ring-blue-500 focus:border-blue-500" placeholder="날짜 선택하기">
+                <button type="button" onclick="submitForm()" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                    조회
+                </button>
+            </div>
+        </form>
+    </div>
     <div class="chart-container">
         <canvas id="csvChart"></canvas>
     </div>
 
     <script>
+        function submitForm() {
+            var selectedDate = document.getElementById('date-input').value;
+            var url = '/two/' + selectedDate + '/';
+            window.location.href = url;
+        }
+
         document.addEventListener('DOMContentLoaded', function () {
             var selectedDate = "{{ selected_date }}";
             var chartDataURL = '/two/' + selectedDate + '/chart_data/';
@@ -42,7 +78,7 @@
 
         function drawChartWithCsvData(canvas, labels, data) {
             const chartData = {
-                labels: labels,  // 시간 정보를 그대로 사용
+                labels: labels,
                 datasets: [{
                     label: '발전량(kW)',
                     backgroundColor: 'rgba(99, 102, 241, 0.5)',
@@ -70,32 +106,37 @@
                     },
                     scales: {
                         xAxes: [{
-                            type: 'time',  // X축을 시간으로 설정
+                            type: 'time',
                             time: {
-                                unit: 'minute',  // 시간 단위를 분으로 설정 (필요에 따라 조절)
+                                unit: 'minute',
                                 displayFormats: {
-                                    minute: 'HH:mm'  // 툴팁 등에 표시되는 시간 형식
+                                    minute: 'HH:mm'
                                 }
                             },
                             scaleLabel: {
                                 display: true,
-                                labelString: 'Time'
+                                labelString: '시간'
                             }
                         }],
                         yAxes: [{
                             display: true,
                             scaleLabel: {
                                 display: true,
-                                labelString: 'Value'
+                                labelString: '값'
+                            },
+                            ticks: {
+                                max: 16000  // y축 최대값 설정
                             }
                         }]
                     }
                 }
             };
 
+
             const ctx = canvas.getContext('2d');
             new Chart(ctx, config);
         }
     </script>
 </body>
+
 </html>
